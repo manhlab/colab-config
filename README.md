@@ -10,27 +10,55 @@ Bước 1: Server ngrokngrok tokenBạn cần server để thực hiện ssh t�
 
 Bước 2: Setup server ngrok trên colabđể thực hiện ssh từ xa máy ảo của colab. thêm mật khẩu ssh và token ở mục mình đánh dấu sẵn
 
-# Install useful stuff! apt-get install --yes ssh screen nano htop ranger git > /dev/null# SSH setting! echo "root:<password>" | chpasswd! echo "PasswordAuthentication yes" > /etc/ssh/sshd_config! echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config! echo "PermitRootLogin yes" >> /etc/ssh/sshd_config! service ssh restart > /dev/null# Download ngrok! wget -q -c -nc https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip! unzip -qq -n ngrok-stable-linux-amd64.zip# Run ngrokauthtoken = "<token>"get_ipython().system_raw('./ngrok authtoken $authtoken && ./ngrok tcp 22 &')! sleep 3# Get the address for SSHimport requestsfrom re import subr = requests.get('http://localhost:4040/api/tunnels')str_ssh = r.json()['tunnels'][0]['public_url']str_ssh = sub("tcp://", "", str_ssh)str_ssh = sub(":", " -p ", str_ssh)str_ssh = "ssh root@" + str_sshprint(str_ssh)
-
+# Install useful stuff! 
+```
+!apt-get install --yes ssh screen nano htop ranger git > /dev/null# SSH setting
+! echo "root:<password>" | chpasswd
+! echo "PasswordAuthentication yes" > /etc/ssh/sshd_config
+! echo "PermitUserEnvironment yes" >> /etc/ssh/sshd_config
+! echo "PermitRootLogin yes" >> /etc/ssh/sshd_config
+! service ssh restart > /dev/null# Download ngrok
+! wget -q -c -nc https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip
+! unzip -qq -n ngrok-stable-linux-amd64.zip# Run ngrok
+authtoken = "<token>"get_ipython().system_raw('./ngrok authtoken $authtoken && ./ngrok tcp 22 &')
+! sleep 3# Get the address for SSH
+import requests
+from re import sub
+r = requests.get('http://localhost:4040/api/tunnels')
+str_ssh = r.json()['tunnels'][0]['public_url']
+str_ssh = sub("tcp://", "", str_ssh)
+str_ssh = sub(":", " -p ", str_ssh)
+str_ssh = "ssh root@" + str_sshprint(str_ssh)
+```
 Các bạn sẽ nhận được lệnh để thực hiện ssh vào máy ảo colab của mình. Lệnh có dạng như sau.
-
+```
 ssh root@0.tcp.ngrok.io -p 14386
-
+```
 Chỉ cần copy và chạy lệnh trên terminal là bạn đã có thể access vào máy ảo như một remote destop với đầy đủ thư mục như một máy UBUNTU đầy đủ.
 
 Buớc 3: Mount Google Drive vào máy ảo colab.để thực hiện lưu trữ và code trực tuyến
 
-# Mount Google Drive and make some folders for vscodefrom google.colab import drivedrive.mount('/googledrive')! mkdir -p /googledrive/My\ Drive/colabdrive! mkdir -p /googledrive/My\ Drive/colabdrive/root/.local/share/code-server! ln -s /googledrive/My\ Drive/colabdrive /! ln -s /googledrive/My\ Drive/colabdrive/root/.local/share/code-server /root/.local/share/
-
-Bước 4: Tải và cài đặt VScode Server! curl -fsSL https://code-server.dev/install.sh | sh > /dev/null! code-server --bind-addr 127.0.0.1:9999 --auth none &
-
+# Mount Google Drive and make some folders for vscode
+```
+from google.colab import drive
+drive.mount('/googledrive')
+! mkdir -p /googledrive/My\ Drive/colabdrive
+! mkdir -p /googledrive/My\ Drive/colabdrive/root/.local/share/code-server
+! ln -s /googledrive/My\ Drive/colabdrive /
+! ln -s /googledrive/My\ Drive/colabdrive/root/.local/share/code-server /root/.local/share/
+```
+Bước 4: Tải và cài đặt VScode Server
+```
+! curl -fsSL https://code-server.dev/install.sh | sh > /dev/null
+! code-server --bind-addr 127.0.0.1:9999 --auth none &
+```
 Cuối cùng tạo một season ssh để thao tác trên máy ảo đã tạo
-
+```
 ssh -L 9999:localhost:9999 root@0.tcp.ngrok.io -p 14386
-
-Mở trình duyệt lên và cùng tận huơng thành quả : http://127.0.0.1:9999
-
+```
+Mở trình duyệt lên và cùng tận huơng thành quả : 
+```
+http://127.0.0.1:9999
+```
 Vscode ServerCác file đã code sẽ đưọc lưu trong google drive. Thao tác trên VSCode Server đem lại trải nghiệm tốt và linh hoạt hơn trên Colab.
 Enjoy VSCode on Colab.
-
-Nếu bạn thấy hữu ích vui lòng nhấn cho mình 1 claps
